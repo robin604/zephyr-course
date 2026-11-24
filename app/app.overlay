@@ -1,0 +1,7 @@
+/ {
+    aliases {
+        /* app-led: the LED this application blinks.
+         * On disco_l475_iot1, led0 is &green_led_2 */
+        app-led = &green_led_2;
+    };
+};

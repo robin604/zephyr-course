@@ -1,5 +1,14 @@
 source "Kconfig.zephyr"
 
+
+config APP_HEARTBEAT_PERIOD_MS
+    int "Heartbeat LED period (ms)"
+    default 500
+    range 100 2000
+    help
+      Time between heartbeat LED blink in milliseconds.
+
+
 menuconfig LED_SUBSYSTEM
     bool "LED Subsystem"
     default y
