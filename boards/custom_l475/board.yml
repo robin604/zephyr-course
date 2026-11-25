@@ -1,0 +1,6 @@
+board:
+  name: custom_l475
+  full_name: Custom L475 board (copy of B-L475E-IOT01A)
+  vendor: st
+  socs:
+    - name: stm32l475xx
