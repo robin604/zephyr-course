@@ -1,0 +1,2 @@
+config BOARD_SCRATCH_L475
+	select SOC_STM32L475XX

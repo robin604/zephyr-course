@@ -1,0 +1,58 @@
+/dts-v1/;
+#include <st/l4/stm32l475Xg.dtsi>
+#include <st/l4/stm32l475v(c-e-g)tx-pinctrl.dtsi>
+
+/ {
+	model = "Scratch-built STM32L475 board";
+	compatible = "iomico,scratch-l475";
+
+	chosen {
+		zephyr,console = &usart1;
+		zephyr,shell-uart = &usart1;
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		green_led_2: led_2 {
+			gpios = <&gpiob 14 GPIO_ACTIVE_HIGH>;
+			label = "User LD2";
+		};
+	};
+
+	aliases {
+		led0 = &green_led_2;
+	};
+};
+
+
+&clk_hsi {
+	status = "okay";
+};
+
+&pll {
+	div-m = <1>;
+	mul-n = <20>;
+	div-p = <7>;
+	div-q = <2>;
+	div-r = <4>;
+	clocks = <&clk_hsi>;
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&pll>;
+	clock-frequency = <DT_FREQ_M(80)>;
+	ahb-prescaler = <1>;
+	apb1-prescaler = <1>;
+	apb2-prescaler = <1>;
+};
+
+
+&usart1 {
+	current-speed = <115200>;
+	pinctrl-0 = <&usart1_tx_pb6 &usart1_rx_pb7>;
+	pinctrl-names = "default";
+	status = "okay";
+};
