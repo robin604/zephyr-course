@@ -3,6 +3,7 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <iomico_drivers/led_sensor.h>
 
 #define DT_DRV_COMPAT iomico_led_sensor
 
@@ -91,6 +92,46 @@ static DEVICE_API(sensor, led_sensor_api) = {
 	.sample_fetch = led_sensor_sample_fetch,
 	.channel_get = led_sensor_channel_get,
 };
+
+/*
+ * Custom extension API (not part of the Sensor API).
+ *
+ * Any struct device can be passed in, so first make sure it really is
+ * one of ours by comparing its api pointer with our own API table.
+ */
+static bool led_sensor_is_ours(const struct device *dev)
+{
+	return dev != NULL && dev->api == &led_sensor_api;
+}
+
+int led_sensor_set_fetch_count(const struct device *dev, uint32_t value)
+{
+	struct led_sensor_data *data;
+
+	if (!led_sensor_is_ours(dev)) {
+		return -EINVAL;
+	}
+
+	data = dev->data;
+	LOG_INF("fetch_count changed from %u to %u", data->fetch_count, value);
+	data->fetch_count = value;
+
+	return 0;
+}
+
+int led_sensor_get_fetch_count(const struct device *dev, uint32_t *value)
+{
+	const struct led_sensor_data *data;
+
+	if (!led_sensor_is_ours(dev) || value == NULL) {
+		return -EINVAL;
+	}
+
+	data = dev->data;
+	*value = data->fetch_count;
+
+	return 0;
+}
 
 #define LED_SENSOR_DEFINE(inst)						\
 	static struct led_sensor_data led_sensor_data_##inst;		\
