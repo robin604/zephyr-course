@@ -1,0 +1,11 @@
+description: LED exposed through the Zephyr Sensor API (course exercise)
+
+compatible: "iomico,led-sensor"
+
+include: sensor-device.yaml
+
+properties:
+  led-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO the LED is connected to.

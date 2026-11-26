@@ -1,34 +1,34 @@
-#include <zephyr/drivers/gpio.h>
+#include <zephyr/device.h>
+#include <zephyr/drivers/sensor.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
-//#define SLEEP_TIME_MS 1000
-//#define SLEEP_TIME_MS CONFIG_BLINK_SLEEP_TIME_MS
 #define SLEEP_TIME_MS CONFIG_APP_HEARTBEAT_PERIOD_MS
-
-/* The devicetree node identifier for the "led0" alias. 
-#define LED_NODE DT_ALIAS(led0) */
-
-/* The devicetree node identifier for the "app-led" alias (from app.overlay). */
-#define LED_NODE DT_ALIAS(app_led)
-
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED_NODE, gpios);
 
 LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
+/* First devicetree node with compatible = "iomico,led-sensor" */
+static const struct device *led_dev = DEVICE_DT_GET_ANY(iomico_led_sensor);
+
 int main(void)
 {
-    bool led_state = true;
+    struct sensor_value val;
 
-    if (!gpio_is_ready_dt(&led)) return 0;
+    if (!device_is_ready(led_dev)) {
+        LOG_ERR("LED sensor device not ready");
+        return 0;
+    }
 
-    if (gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE) < 0) return 0;
+    LOG_INF("Using LED sensor driver: %s", led_dev->name);
 
     while (1) {
-        if (gpio_pin_toggle_dt(&led) < 0) return 0;
+        /* sample_fetch -> LED on */
+        if (sensor_sample_fetch(led_dev) < 0) return 0;
+        k_msleep(SLEEP_TIME_MS);
 
-        led_state = !led_state;
-        LOG_INF("LED state: %s", led_state ? "ON" : "OFF");
+        /* channel_get -> LED off */
+        if (sensor_channel_get(led_dev, SENSOR_CHAN_ALL, &val) < 0) return 0;
+        LOG_INF("LED state reported by driver: %d", val.val1);
         k_msleep(SLEEP_TIME_MS);
     }
     return 0;

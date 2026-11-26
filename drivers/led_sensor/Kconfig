@@ -1,0 +1,9 @@
+menuconfig LED_SENSOR
+	bool "LED sensor driver"
+	default y
+	depends on DT_HAS_IOMICO_LED_SENSOR_ENABLED
+	select GPIO
+	help
+	  Driver that exposes an on-board LED through the Sensor API.
+	  sensor_sample_fetch() turns the LED on, sensor_channel_get()
+	  turns it off.
